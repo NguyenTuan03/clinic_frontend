@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useApp } from "../context/app-context";
-import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../components/ui/card";
+import { useApp } from "../../../context/app-context";
+import { Button } from "../../../components/ui/button";
+import { Input } from "../../../components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "../../../components/ui/card";
 import { HeartPulse, ArrowRight } from "lucide-react";
-import { Gender } from "../types";
+import { Gender } from "../../../types";
 
 export default function Register() {
   const { register } = useApp();

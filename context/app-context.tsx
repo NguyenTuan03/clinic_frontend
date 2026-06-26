@@ -4,7 +4,6 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import {
   User,
   Doctor,
-  Patient,
   Appointment,
   UserRole,
   AppointmentStatus,
@@ -138,18 +137,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Load state from localStorage on mount (client side only)
   useEffect(() => {
-    const savedUser = localStorage.getItem("clinic_user");
-    const savedApts = localStorage.getItem("clinic_appointments");
+    const timer = setTimeout(() => {
+      const savedUser = localStorage.getItem("clinic_user");
+      const savedApts = localStorage.getItem("clinic_appointments");
 
-    if (savedUser) {
-      setCurrentUser(JSON.parse(savedUser));
-    }
-    if (savedApts) {
-      setAppointments(JSON.parse(savedApts));
-    } else {
-      setAppointments(INITIAL_APPOINTMENTS);
-      localStorage.setItem("clinic_appointments", JSON.stringify(INITIAL_APPOINTMENTS));
-    }
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+      if (savedApts) {
+        setAppointments(JSON.parse(savedApts));
+      } else {
+        setAppointments(INITIAL_APPOINTMENTS);
+        localStorage.setItem("clinic_appointments", JSON.stringify(INITIAL_APPOINTMENTS));
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Save changes to localStorage
@@ -216,8 +219,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     name: string,
     email: string,
     phone: string,
-    gender: Gender,
-    dateOfBirth: string
   ) => {
     const newUser: User = {
       id: `pat-${Date.now()}`,

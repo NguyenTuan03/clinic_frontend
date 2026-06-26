@@ -16,6 +16,7 @@ import {
   LogOut,
   AlertCircle,
   ShieldCheck,
+  XCircle,
 } from "lucide-react";
 import { AppointmentStatus, UserRole, Specialty } from "../../types";
 
@@ -27,28 +28,35 @@ const SPECIALTY_LABELS = {
   [Specialty.DENTISTRY]: "Nha khoa",
 };
 
+const timeSlots = [
+  "08:00 - 09:00",
+  "09:00 - 10:00",
+  "10:00 - 11:00",
+  "11:00 - 12:00",
+  "13:30 - 14:30",
+  "14:30 - 15:30",
+  "15:30 - 16:30",
+  "16:30 - 17:30"
+];
+
 export default function PatientDashboard() {
   const { currentUser, doctors, appointments, bookAppointment, updateAppointmentStatus, logout } = useApp();
   const router = useRouter();
 
   // Form states for booking
-  const [selectedDoctorId, setSelectedDoctorId] = useState("");
-  const [bookingDate, setBookingDate] = useState("");
-  const [bookingSlot, setBookingSlot] = useState("");
+  const [selectedDoctorId, setSelectedDoctorId] = useState(doctors[0]?.id || "");
+  const [bookingDate, setBookingDate] = useState(() => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1); // default to tomorrow
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  });
+  const [bookingSlot, setBookingSlot] = useState(timeSlots[0]);
   const [symptoms, setSymptoms] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [formError, setFormError] = useState("");
-
-  const timeSlots = [
-    "08:00 - 09:00",
-    "09:00 - 10:00",
-    "10:00 - 11:00",
-    "11:00 - 12:00",
-    "13:30 - 14:30",
-    "14:30 - 15:30",
-    "15:30 - 16:30",
-    "16:30 - 17:30"
-  ];
 
   // Protection Check
   useEffect(() => {
@@ -60,21 +68,6 @@ export default function PatientDashboard() {
       router.push("/doctor");
     }
   }, [currentUser, router]);
-
-  // Set default values for booking date
-  useEffect(() => {
-    const today = new Date();
-    today.setDate(today.getDate() + 1); // default to tomorrow
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    setBookingDate(`${yyyy}-${mm}-${dd}`);
-
-    if (doctors.length > 0) {
-      setSelectedDoctorId(doctors[0].id);
-    }
-    setBookingSlot(timeSlots[0]);
-  }, [doctors]);
 
   if (!currentUser || currentUser.role !== UserRole.PATIENT) {
     return (
