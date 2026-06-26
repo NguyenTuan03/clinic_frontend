@@ -26,10 +26,15 @@ export enum Gender {
 
 export interface User {
   id: string;
-  name: string;
   email: string;
   role: UserRole;
-  phone: string;
+  name: string;
+}
+
+export interface UserRegister {
+  email: string;
+  password: string;
+  name: string;
 }
 
 export interface Doctor {

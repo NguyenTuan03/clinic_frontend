@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useApp } from "../../context/app-context";
+import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -40,7 +41,8 @@ const timeSlots = [
 ];
 
 export default function PatientDashboard() {
-  const { currentUser, doctors, appointments, bookAppointment, updateAppointmentStatus, logout } = useApp();
+  const { doctors, appointments, bookAppointment, updateAppointmentStatus } = useApp();
+  const { user: currentUser, logout } = useAuth();
   const router = useRouter();
 
   // Form states for booking

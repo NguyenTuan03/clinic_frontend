@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useApp } from "../../context/app-context";
+import { useApp } from "../../context/AppContext";
+import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -21,7 +22,8 @@ import {
 import { AppointmentStatus, UserRole } from "../../types";
 
 export default function DoctorDashboard() {
-  const { currentUser, appointments, updateAppointmentStatus, logout } = useApp();
+  const { appointments, updateAppointmentStatus } = useApp();
+  const { user: currentUser, logout } = useAuth();
   const router = useRouter();
 
   const [filterStatus, setFilterStatus] = useState<AppointmentStatus | "ALL">("ALL");

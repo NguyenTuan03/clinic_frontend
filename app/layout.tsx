@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { AppProvider } from "../context/app-context";
+import { AppProvider } from "../context/AppContext";
+import { AuthContextProvider } from "../context/AuthContext";
+import QueryProvider from "../context/QueryProvider";
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,9 +36,14 @@ export default function RootLayout({
         className="min-h-full flex flex-col bg-zinc-50 dark:bg-zinc-950 text-zinc-950 dark:text-zinc-50"
         suppressHydrationWarning
       >
-        <AppProvider>
-          {children}
-        </AppProvider>
+        <QueryProvider>
+          <AuthContextProvider>
+            <AppProvider>
+              {children}
+            </AppProvider>
+          </AuthContextProvider>
+          <Toaster position="top-right" reverseOrder={false} />
+        </QueryProvider>
       </body>
     </html>
   );

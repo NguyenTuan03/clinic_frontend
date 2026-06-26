@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { useApp } from "../context/app-context";
+import { useApp } from "../context/AppContext";
+import { useAuth } from "../context/AuthContext";
 import { Button } from "../components/ui/button";
 import { Card, CardContent } from "../components/ui/card";
 import {
@@ -27,7 +28,8 @@ const SPECIALTY_LABELS = {
 };
 
 export default function Home() {
-  const { doctors, currentUser, logout } = useApp();
+  const { doctors } = useApp();
+  const { user: currentUser, logout } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-zinc-950">
