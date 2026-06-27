@@ -53,7 +53,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     timeSlot: string,
     symptoms: string
   ) => {
-    if (!currentUser) return;
+    if (!currentUser || !currentUser.id || !currentUser.name) return;
 
     const doctor = doctors.find(doc => doc.id === doctorId);
     const doctorName = doctor ? doctor.name : "Bác sĩ Chuyên khoa";

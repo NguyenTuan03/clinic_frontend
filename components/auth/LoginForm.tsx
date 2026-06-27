@@ -7,7 +7,7 @@ import { Input } from "../ui/input";
 import { useLogin } from "@/hooks/useLogin";
 
 export default function LoginForm() {
-  const { mutate: login, isPending, isError, error: serverError } = useLogin();
+  const { login, isPending, isError, error: serverError } = useLogin();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

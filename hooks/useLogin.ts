@@ -52,7 +52,7 @@ export function useLogin() {
   const serverErrorMessage = axiosError?.response?.data?.message || mutation.error?.message || "";
 
   return {
-    mutate: mutation.mutate,
+    login: mutation.mutate,
     isPending: mutation.isPending,
     isError: mutation.isError,
     error: mutation.error ? serverErrorMessage : "",

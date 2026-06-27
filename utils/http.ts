@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
-const apiVersion = process.env.NEXT_PUBLIC_VERSION || "/api/v1";
+const apiVersion = process.env.NEXT_PUBLIC_VERSION || "api/v1";
 
 const httpInstance = axios.create({
   baseURL: `${apiURL}/${apiVersion}`,

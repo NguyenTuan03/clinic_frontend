@@ -25,10 +25,10 @@ export enum Gender {
 }
 
 export interface User {
-  id: string;
-  email: string;
-  role: UserRole;
-  name: string;
+  id?: string;
+  email?: string;
+  role?: UserRole;
+  name?: string;
 }
 
 export interface UserRegister {

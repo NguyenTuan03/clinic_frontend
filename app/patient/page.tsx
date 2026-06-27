@@ -129,7 +129,6 @@ export default function PatientDashboard() {
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
               <span className="text-sm font-bold text-zinc-950 dark:text-white block">{currentUser.name}</span>
-              <span className="text-xs text-zinc-400 dark:text-zinc-500 block">{currentUser.phone}</span>
             </div>
             <button
               onClick={handleLogout}

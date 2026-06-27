@@ -4,7 +4,7 @@ import LoginForm from "../../../components/auth/LoginForm";
 
 export default function Login() {
   return (
-    <div className="flex flex-col justify-center items-center px-4 py-12 bg-slate-50/50 dark:bg-zinc-950">
+    <div className="flex flex-col justify-center items-center px-4 bg-slate-50/50 dark:bg-zinc-950">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold text-zinc-900 dark:text-white">Chào mừng quay trở lại</CardTitle>
