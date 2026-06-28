@@ -1,17 +1,33 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useLogin } from "@/hooks/useLogin";
+import { useAuth } from "@/context/AuthContext";
+import { UserRole } from "@/types";
 
 export default function LoginForm() {
   const { login, isPending, isError, error: serverError } = useLogin();
+  const { user } = useAuth();
+  const router = useRouter();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [validationError, setValidationError] = useState("");
+
+  // Tự động chuyển hướng nếu người dùng đã đăng nhập trước đó
+  useEffect(() => {
+    if (user) {
+      if (user.role === UserRole.DOCTOR) {
+        router.push("/doctor");
+      } else {
+        router.push("/patient");
+      }
+    }
+  }, [user, router]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,6 +46,16 @@ export default function LoginForm() {
   };
 
   const displayError = validationError || (isError ? serverError : "");
+
+  if (user) {
+    return (
+      <div className="text-center py-4">
+        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 animate-pulse">
+          Đang chuyển hướng vào hệ thống...
+        </span>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

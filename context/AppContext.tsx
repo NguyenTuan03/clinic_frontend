@@ -8,6 +8,7 @@ import {
   Specialty,
 } from "../types";
 import { useAuth } from "./AuthContext";
+import { MOCK_DOCTORS } from "@/constants";
 
 interface AppContextType {
   doctors: Doctor[];
@@ -16,15 +17,19 @@ interface AppContextType {
   setAppointments: React.Dispatch<React.SetStateAction<Appointment[]>>;
   bookAppointment: (doctorId: string, date: string, timeSlot: string, symptoms: string) => void;
   updateAppointmentStatus: (appointmentId: string, status: AppointmentStatus, notes?: string) => void;
+  mobileMenuOpen: boolean;
+  setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { user: currentUser } = useAuth();
-  const [doctors, setDoctors] = useState<Doctor[]>([]);
+
+  const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
 
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   // Load appointments from localStorage on mount (client side only)
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -102,7 +107,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         appointments,
         setAppointments,
         bookAppointment,
-        updateAppointmentStatus
+        updateAppointmentStatus,
+        mobileMenuOpen,
+        setMobileMenuOpen
       }}
     >
       {children}

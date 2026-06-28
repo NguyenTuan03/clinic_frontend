@@ -1,6 +1,6 @@
 export enum UserRole {
-  DOCTOR = "DOCTOR",
-  PATIENT = "PATIENT"
+  DOCTOR = "doctor",
+  PATIENT = "patient"
 }
 
 export enum AppointmentStatus {

@@ -1,11 +1,9 @@
-"use client";
-
 import React from "react";
 import Link from "next/link";
-import { useApp } from "../context/AppContext";
-import { useAuth } from "../context/AuthContext";
-import { Button } from "../components/ui/button";
-import { Card, CardContent } from "../components/ui/card";
+import HomeHeader from "@/components/layout/HomeHeader";
+import HeroActions from "@/components/home/HeroActions";
+import FooterActions from "@/components/home/FooterActions";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   HeartPulse,
   Calendar,
@@ -17,7 +15,8 @@ import {
   MapPin,
   Star
 } from "lucide-react";
-import { Specialty } from "../types";
+import { Specialty } from "@/types";
+import { MOCK_DOCTORS } from "@/constants";
 
 const SPECIALTY_LABELS = {
   [Specialty.GENERAL]: "Nội tổng quát",
@@ -28,58 +27,10 @@ const SPECIALTY_LABELS = {
 };
 
 export default function Home() {
-  const { doctors } = useApp();
-  const { user: currentUser, logout } = useAuth();
-
   return (
     <div className="min-h-screen flex flex-col bg-slate-50/50 dark:bg-zinc-950">
       {/* Navigation Header */}
-      <header className="sticky top-0 z-50 bg-white/80 dark:bg-zinc-900/80 backdrop-blur-md border-b border-zinc-100 dark:border-zinc-800/80">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/20">
-              <HeartPulse className="w-6 h-6" />
-            </div>
-            <div>
-              <span className="font-bold text-lg leading-tight tracking-tight block text-zinc-900 dark:text-white">
-                Tâm An Clinic
-              </span>
-              <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold tracking-wider uppercase block -mt-0.5">
-                Chăm sóc tận tâm
-              </span>
-            </div>
-          </Link>
-
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-zinc-600 dark:text-zinc-300">
-            <a href="#about" className="hover:text-emerald-600 transition-colors">Về chúng tôi</a>
-            <a href="#services" className="hover:text-emerald-600 transition-colors">Chuyên khoa</a>
-            <a href="#doctors" className="hover:text-emerald-600 transition-colors">Đội ngũ bác sĩ</a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            {currentUser ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Chào, <strong className="font-semibold text-zinc-900 dark:text-white">{currentUser.name}</strong>
-                </span>
-                <Link href={currentUser.role === "DOCTOR" ? "/doctor" : "/patient"}>
-                  <Button variant="primary" size="sm">Dashboard</Button>
-                </Link>
-                <Button variant="ghost" size="sm" onClick={logout}>Đăng xuất</Button>
-              </div>
-            ) : (
-              <>
-                <Link href="/login">
-                  <Button variant="ghost" size="sm">Đăng nhập</Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="primary" size="sm" className="hidden sm:inline-flex">Đăng ký ngay</Button>
-                </Link>
-              </>
-            )}
-          </div>
-        </div>
-      </header>
+      <HomeHeader />
 
       {/* Hero Section */}
       <section className="relative py-20 lg:py-28 overflow-hidden">
@@ -100,28 +51,7 @@ export default function Home() {
               <p className="text-lg text-zinc-600 dark:text-zinc-400 max-w-[60ch] leading-relaxed mb-8">
                 Đặt lịch khám nhanh chóng với đội ngũ bác sĩ chuyên khoa đầu ngành. Trải nghiệm y tế tiện lợi, chuyên nghiệp và tận tâm tại Tâm An.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                {currentUser ? (
-                  <Link href={currentUser.role === "DOCTOR" ? "/doctor" : "/patient"}>
-                    <Button variant="primary" size="lg" className="w-full sm:w-auto">
-                      Vào trang quản lý <ArrowRight className="w-5 h-5 ml-2" />
-                    </Button>
-                  </Link>
-                ) : (
-                  <>
-                    <Link href="/register">
-                      <Button variant="primary" size="lg" className="w-full sm:w-auto shadow-lg shadow-emerald-600/20">
-                        Đăng ký lịch khám <ArrowRight className="w-5 h-5 ml-2" />
-                      </Button>
-                    </Link>
-                    <Link href="/login">
-                      <Button variant="outline" size="lg" className="w-full sm:w-auto">
-                        Đăng nhập Dashboard
-                      </Button>
-                    </Link>
-                  </>
-                )}
-              </div>
+              <HeroActions />
             </div>
 
             {/* Right Column Image */}
@@ -135,7 +65,7 @@ export default function Home() {
                     alt="Bác sĩ tại phòng khám"
                     className="rounded-[1.5rem] w-full object-cover h-[350px] sm:h-[400px]"
                   />
-
+                  
                   {/* Floating badge */}
                   <div className="absolute -bottom-6 -left-6 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl shadow-lg flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
@@ -218,7 +148,7 @@ export default function Home() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {doctors.map((doctor) => (
+            {MOCK_DOCTORS.map((doctor) => (
               <Card key={doctor.id} className="group hover:-translate-y-1 transition-all duration-300">
                 <CardContent className="p-6">
                   <div className="flex items-start gap-4">
@@ -263,28 +193,7 @@ export default function Home() {
           <p className="text-emerald-100 max-w-[65ch] mx-auto text-base sm:text-lg mb-8 leading-relaxed">
             Hãy bắt đầu bảo vệ sức khỏe của bạn và người thân bằng cách đặt lịch khám trực tuyến ngay hôm nay. Chỉ với vài thao tác đơn giản, bạn sẽ tránh được hàng giờ chờ đợi.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            {currentUser ? (
-              <Link href="/patient">
-                <Button variant="secondary" size="lg" className="w-full sm:w-auto text-emerald-950 font-bold bg-white hover:bg-emerald-50">
-                  Đặt lịch khám ngay
-                </Button>
-              </Link>
-            ) : (
-              <>
-                <Link href="/register">
-                  <Button variant="secondary" size="lg" className="w-full sm:w-auto text-emerald-950 font-bold bg-white hover:bg-emerald-50">
-                    Đăng ký tài khoản
-                  </Button>
-                </Link>
-                <Link href="/login">
-                  <Button variant="outline" size="lg" className="w-full sm:w-auto border-white text-white hover:bg-white/10">
-                    Đăng nhập hệ thống
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
+          <FooterActions />
         </div>
       </section>
 
