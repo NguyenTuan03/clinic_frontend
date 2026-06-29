@@ -11,6 +11,7 @@ import { useApp } from "@/context/AppContext";
 import { useAuth } from "@/context/AuthContext";
 import { useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+import { formatTime } from "@/helpers/formatTime";
 
 export default function AddScheduleComponent({ onSuccess }: { onSuccess?: () => void }) {
     const { schedules } = useApp();
@@ -54,7 +55,7 @@ export default function AddScheduleComponent({ onSuccess }: { onSuccess?: () => 
 
         // Check duplicate schedule slot
         const isDuplicate = doctorSchedules.some(
-            s => s.date === scheduleDate && s.start_time === startTime && s.end_time === endTime
+            s => s.date === scheduleDate && formatTime(s.start_time) === startTime && formatTime(s.end_time) === endTime
         );
 
         if (isDuplicate) {
