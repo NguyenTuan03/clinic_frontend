@@ -3,14 +3,13 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useApp } from "@/context/AppContext";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
   Clock,
   Search,
   Star,
-  User,
   Activity,
   CalendarRange
 } from "lucide-react";

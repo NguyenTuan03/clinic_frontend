@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AppointmentStatus, Schedule } from "@/types";
-import { CardContent } from "../ui/card";
+import { CardContent } from "../../ui/card";
 import { useAuth } from "@/context/AuthContext";
 import { useApp } from "@/context/AppContext";
 import { AlertCircle, Loader2, List, Calendar as CalendarIconUI } from "lucide-react";
@@ -14,13 +14,13 @@ import ShadcnBigCalendar from "@/components/shadcn-big-calendar/shadcn-big-calen
 import moment from "moment";
 import { momentLocalizer, Views, View } from "react-big-calendar";
 
-import SchedulesAgendaList from "./SchedulesAgendaList";
 import ScheduleDetailModal from "./ScheduleDetailModal";
 import useDoctorCalendar from "./hooks/useDoctorCalendar";
 import useDeleteSchedule from "./hooks/useDeleteSchedule";
 
 // Cấu hình ngôn ngữ tiếng Việt cho moment
 import "moment/locale/vi";
+import SchedulesAgendaList from "./SchedulesAgendaList";
 moment.locale("vi");
 const localizer = momentLocalizer(moment);
 
@@ -53,13 +53,14 @@ export default function ScheduleListComponent() {
     // Hàm kiểm tra xem slot có bị đặt chưa
     const checkIsBooked = (scheduleId: number) =>
         appointments.some(
-            apt => Number(apt.scheduleId) === scheduleId && apt.status !== AppointmentStatus.CANCELLED
+            apt => Number(apt.schedule_id) === scheduleId && apt.status !== AppointmentStatus.CANCELLED
         );
 
-    // Hook calendar: chuyển schedule → events, eventPropGetter, minTime, maxTime, messages, handleSelectEvent
+    // Hook calendar: chuyển schedule → events, eventPropGetter, dayPropGetter, minTime, maxTime, messages, handleSelectEvent
     const {
         events,
         eventPropGetter,
+        dayPropGetter,
         minTime,
         maxTime,
         handleSelectEvent,
@@ -134,15 +135,19 @@ export default function ScheduleListComponent() {
                 </div>
 
                 {/* Color Legend */}
-                <div className="flex items-center gap-4 text-xs font-semibold">
-                    <span className="flex items-center gap-1.5">
-                        <span className="w-3.5 h-3.5 rounded-md bg-emerald-600" />
-                        <span>Lịch rảnh (Trống)</span>
-                    </span>
-                    <span className="flex items-center gap-1.5">
-                        <span className="w-3.5 h-3.5 rounded-md bg-sky-600" />
-                        <span>Đã được đặt</span>
-                    </span>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#065f46", borderLeft: "2px solid #022c22" }} />
+                        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Giờ rảnh</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-sm" style={{ background: "#0369a1", borderLeft: "2px solid #075985" }} />
+                        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Có lịch hẹn</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <span className="inline-block w-3 h-3 rounded-sm bg-emerald-50 border border-emerald-200" />
+                        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">Ngày có lịch</span>
+                    </div>
                 </div>
             </div>
 
@@ -154,13 +159,14 @@ export default function ScheduleListComponent() {
                         events={events}
                         startAccessor="start"
                         endAccessor="end"
-                        views={[Views.MONTH, Views.WEEK]}
+                        views={[Views.WEEK]}
                         view={view}
                         onView={(newView) => setView(newView)}
                         date={date}
                         onNavigate={(newDate) => setDate(newDate)}
                         onSelectEvent={handleSelectEvent}
                         eventPropGetter={eventPropGetter}
+                        dayPropGetter={dayPropGetter}
                         min={minTime}
                         max={maxTime}
                         messages={messages}

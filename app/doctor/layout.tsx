@@ -13,7 +13,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { UserRole } from "../../types";
+import { AppointmentStatus, UserRole } from "../../types";
 import { useApp } from "../../context/AppContext";
 
 export default function DoctorLayout({ children }: { children: React.ReactNode }) {
@@ -52,7 +52,7 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
   };
 
   const pendingCount = appointments.filter(
-    a => a.doctorId === currentUser.id && a.status === "PENDING"
+    a => a.schedule?.user?.id === Number(currentUser.id) && a.status === AppointmentStatus.PENDING
   ).length;
 
   return (
@@ -87,17 +87,16 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
 
       {/* Main Layout */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full grid lg:grid-cols-12 gap-8">
-        
+
         {/* Navigation Sidebar */}
         <aside className="lg:col-span-3">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50 rounded-2xl p-4 space-y-2 flex flex-col">
             <Link
               href="/doctor"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                pathname === "/doctor"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
                   : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              }`}
+                }`}
             >
               <Activity className="w-5 h-5" />
               <span>Tổng quan</span>
@@ -105,11 +104,10 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
 
             <Link
               href="/doctor/appointments"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                pathname === "/doctor/appointments"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor/appointments"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
                   : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              }`}
+                }`}
             >
               <CalendarIcon className="w-5 h-5" />
               <span>Lịch hẹn bệnh nhân</span>
@@ -122,11 +120,10 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
 
             <Link
               href="/doctor/schedules"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
-                pathname === "/doctor/schedules"
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor/schedules"
                   ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
                   : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-              }`}
+                }`}
             >
               <Sliders className="w-5 h-5" />
               <span>Cấu hình lịch rảnh</span>

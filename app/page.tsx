@@ -1,5 +1,3 @@
-import React from "react";
-import Link from "next/link";
 import HomeHeader from "@/components/layout/HomeHeader";
 import HeroActions from "@/components/home/HeroActions";
 import FooterActions from "@/components/home/FooterActions";
@@ -9,7 +7,6 @@ import {
   Calendar,
   ShieldCheck,
   UserCheck,
-  ArrowRight,
   Clock,
   Phone,
   MapPin,

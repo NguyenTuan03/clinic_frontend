@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import { Plus, X } from "lucide-react";
-import { Card, CardHeader, CardTitle } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card, CardHeader, CardTitle } from "../../ui/card";
+import { Button } from "../../ui/button";
 import AddScheduleComponent from "./AddScheduleComponent";
 
 export default function AddScheduleButtonWithModal() {

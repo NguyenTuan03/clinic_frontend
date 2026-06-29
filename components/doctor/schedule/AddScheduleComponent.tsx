@@ -1,9 +1,9 @@
 "use client";
 
 import { AlertCircle, Plus } from "lucide-react";
-import { CardContent } from "../ui/card";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { CardContent } from "../../ui/card";
+import { Input } from "../../ui/input";
+import { Button } from "../../ui/button";
 import { useState } from "react";
 import { getTodayString } from "@/helpers/getTodayString";
 import { createScheduleServerAction } from "@/services/schedule";

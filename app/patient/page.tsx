@@ -16,6 +16,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { AppointmentStatus, Specialty } from "../../types";
+import { formatTime } from "@/helpers/formatTime";
 
 const SPECIALTY_LABELS = {
   [Specialty.GENERAL]: "Nội tổng quát",
@@ -32,17 +33,16 @@ export default function PatientDashboard() {
   // Form states for booking
   const [selectedDoctorId, setSelectedDoctorId] = useState(doctors[0]?.id || "");
   const [selectedScheduleId, setSelectedScheduleId] = useState("");
-  const [symptoms, setSymptoms] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [formError, setFormError] = useState("");
 
   const checkIsBooked = useCallback((scheduleId: number) => {
     return appointments.some(
-      apt => Number(apt.scheduleId) === scheduleId && apt.status !== AppointmentStatus.CANCELLED
+      apt => Number(apt.schedule_id) === scheduleId && apt.status !== AppointmentStatus.CANCELLED
     );
   }, [appointments]);
 
-  // Sync selectedScheduleId when schedules list finishes loading or doctor changes asynchronously to avoid cascading renders
+  // Sync selectedScheduleId when schedules list finishes loading or doctor changes
   useEffect(() => {
     const doctorSchedules = schedules.filter(s => s.user_id === Number(selectedDoctorId) && !checkIsBooked(s.id));
     const targetId = doctorSchedules.length > 0 ? String(doctorSchedules[0].id) : "";
@@ -70,26 +70,25 @@ export default function PatientDashboard() {
 
   // Filter appointments for this patient
   const patientAppointments = currentUser
-    ? appointments.filter(apt => apt.patientId === currentUser.id)
+    ? appointments.filter(apt => Number(apt.patient_id) === Number(currentUser.id))
     : [];
 
   const handleBook = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedDoctorId || !selectedScheduleId || !symptoms.trim()) {
-      setFormError("Vui lòng nhập đầy đủ các trường và triệu chứng");
+    if (!selectedDoctorId || !selectedScheduleId) {
+      setFormError("Vui lòng chọn bác sĩ và khung giờ");
       return;
     }
 
     setFormError("");
-    bookAppointment(selectedDoctorId, selectedScheduleId, symptoms);
-    setSymptoms("");
+    bookAppointment(selectedDoctorId, selectedScheduleId, "");
     setBookingSuccess(true);
-    setTimeout(() => setBookingSuccess(false), 5000); // hide success alert after 5s
+    setTimeout(() => setBookingSuccess(false), 5000);
   };
 
-  const handleCancelAppointment = (id: string) => {
+  const handleCancelAppointment = (id: number) => {
     if (confirm("Bạn có chắc chắn muốn hủy yêu cầu đặt lịch này không?")) {
-      updateAppointmentStatus(id, AppointmentStatus.CANCELLED);
+      updateAppointmentStatus(String(id), AppointmentStatus.CANCELLED);
     }
   };
 
@@ -161,26 +160,11 @@ export default function PatientDashboard() {
                       })
                       .map(sch => (
                         <option key={sch.id} value={String(sch.id)}>
-                          Ngày {sch.date} ({sch.start_time} - {sch.end_time})
+                          Ngày {sch.date} ({formatTime(sch.start_time)} - {formatTime(sch.end_time)})
                         </option>
                       ))}
                   </select>
                 )}
-              </div>
-
-              {/* Symptoms Textarea */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                  Triệu chứng hoặc Lý do khám
-                </label>
-                <textarea
-                  value={symptoms}
-                  onChange={(e) => setSymptoms(e.target.value)}
-                  placeholder="Mô tả ngắn gọn vấn đề sức khỏe của bạn (ví dụ: đau họng, nhức đầu 2 ngày nay...)"
-                  rows={4}
-                  className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-sm leading-relaxed"
-                  required
-                />
               </div>
 
               <Button 
@@ -211,56 +195,51 @@ export default function PatientDashboard() {
                 Bạn chưa đăng ký lịch hẹn nào. Hãy đặt lịch hẹn đầu tiên ở mẫu bên cạnh.
               </div>
             ) : (
-              patientAppointments.map((apt) => (
-                <div key={apt.id} className="p-6 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-colors flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-                  <div className="space-y-2 flex-1">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <h4 className="font-bold text-zinc-900 dark:text-white text-base">
-                        {apt.doctorName}
-                      </h4>
-                      <span className="inline-flex px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
-                        {SPECIALTY_LABELS[apt.specialty]}
-                      </span>
-                      <Badge status={apt.status} />
-                    </div>
+              patientAppointments.map((apt) => {
+                const docName = apt.schedule?.user?.name || "Bác sĩ Chuyên khoa";
+                const start = formatTime(apt.schedule?.start_time);
+                const end = formatTime(apt.schedule?.end_time);
+                const timeSlot = `${start} - ${end}`;
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
-                      <span className="flex items-center gap-1">
-                        <CalendarIcon className="w-4 h-4" />
-                        {apt.date}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {apt.timeSlot}
-                      </span>
-                    </div>
-
-                    <div className="p-3 bg-zinc-50 dark:bg-zinc-950 rounded-xl text-sm border border-zinc-100 dark:border-zinc-900">
-                      <strong className="text-zinc-700 dark:text-zinc-300 font-semibold block mb-0.5">Triệu chứng của bạn:</strong>
-                      <span className="text-zinc-600 dark:text-zinc-400 block leading-relaxed">{apt.symptoms}</span>
-                    </div>
-
-                    {apt.notes && (
-                      <div className="p-3 bg-emerald-50/20 dark:bg-emerald-950/10 rounded-xl text-sm border border-emerald-100/40 dark:border-emerald-900/20">
-                        <strong className="text-emerald-700 dark:text-emerald-400 font-semibold block mb-0.5">Lời khuyên của bác sĩ:</strong>
-                        <span className="text-zinc-700 dark:text-zinc-300 block leading-relaxed">{apt.notes}</span>
+                return (
+                  <div key={apt.id} className="p-6 hover:bg-zinc-50/50 dark:hover:bg-zinc-900/30 transition-colors flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <div className="flex items-center gap-2.5 flex-wrap">
+                        <h4 className="font-bold text-zinc-900 dark:text-white text-base">
+                          {docName}
+                        </h4>
+                        <span className="inline-flex px-1.5 py-0.5 rounded bg-zinc-100 dark:bg-zinc-800 text-[10px] font-bold text-zinc-600 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                          {SPECIALTY_LABELS[Specialty.GENERAL]}
+                        </span>
+                        <Badge status={apt.status} />
                       </div>
+
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+                        <span className="flex items-center gap-1">
+                          <CalendarIcon className="w-4 h-4" />
+                          {apt.schedule?.date || "Không xác định"}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          {timeSlot}
+                        </span>
+                      </div>
+                    </div>
+
+                    {(apt.status === AppointmentStatus.PENDING || apt.status === AppointmentStatus.CONFIRMED) && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleCancelAppointment(apt.id)}
+                        className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400 font-semibold flex items-center gap-1 self-end sm:self-start shrink-0"
+                      >
+                        <XCircle className="w-4 h-4" />
+                        Hủy hẹn
+                      </Button>
                     )}
                   </div>
-
-                  {(apt.status === AppointmentStatus.PENDING || apt.status === AppointmentStatus.CONFIRMED) && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleCancelAppointment(apt.id)}
-                      className="text-red-500 hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/20 dark:hover:text-red-400 font-semibold flex items-center gap-1 self-end sm:self-start shrink-0"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      Hủy hẹn
-                    </Button>
-                  )}
-                </div>
-              ))
+                );
+              })
             )}
           </CardContent>
         </Card>

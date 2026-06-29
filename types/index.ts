@@ -4,10 +4,10 @@ export enum UserRole {
 }
 
 export enum AppointmentStatus {
-  PENDING = "PENDING",     // Chờ xác nhận
-  CONFIRMED = "CONFIRMED", // Đã xác nhận
-  COMPLETED = "COMPLETED", // Đã hoàn thành
-  CANCELLED = "CANCELLED"  // Đã hủy
+  PENDING = "pending",     // Chờ xác nhận
+  CONFIRMED = "confirmed", // Đã xác nhận
+  DONE = "done",           // Đã hoàn thành
+  CANCELLED = "cancelled"  // Đã hủy
 }
 
 export enum Specialty {
@@ -58,18 +58,36 @@ export interface Patient {
 }
 
 export interface Appointment {
-  id: string;
-  patientId: string;
-  patientName: string;
-  doctorId: string;
-  doctorName: string;
-  specialty: Specialty;
-  date: string; // YYYY-MM-DD
-  timeSlot: string; // ví dụ: "08:00 - 09:00"
+  id: number;
+  patient_id: number;
+  schedule_id: number;
   status: AppointmentStatus;
-  symptoms: string; // triệu chứng
-  notes?: string; // ghi chú của bác sĩ
-  scheduleId?: string;
+  created_at: string;
+  updated_at: string;
+  schedule: {
+    id: number;
+    date: string;
+    start_time: string;
+    end_time: string;
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      role: {
+        id: number;
+        name: string;
+      }
+    }
+  },
+  patient: {
+    id: number;
+    name: string;
+    email: string;
+    role: {
+      id: number;
+      name: string;
+    }
+  }
 }
 
 export interface Schedule {
@@ -79,6 +97,14 @@ export interface Schedule {
   start_time: string;
   end_time: string;
   updated_at: string;
+  user: {
+    name: string;
+    email: string;
+    role: {
+      id: number;
+      name: string;
+    }
+  }
 }
 
 export interface TimeSlot {

@@ -3,8 +3,8 @@
 import React from "react";
 import { Schedule } from "@/types";
 import { X, CalendarIcon, Clock, Trash2, Loader2 } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { Button } from "../ui/button";
+import { Card, CardHeader, CardTitle, CardContent } from "../../ui/card";
+import { Button } from "../../ui/button";
 
 interface CalendarEvent {
     id: number;

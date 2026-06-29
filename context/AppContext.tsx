@@ -5,7 +5,6 @@ import {
   Doctor,
   Appointment,
   AppointmentStatus,
-  Specialty,
   Schedule,
   UserRole,
 } from "../types";
@@ -78,6 +77,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       start_time: startTime,
       end_time: endTime,
       updated_at: new Date().toISOString(),
+      user: {
+        name: currentUser.name || "Bác sĩ",
+        email: currentUser.email || "",
+        role: {
+          id: 1,
+          name: UserRole.DOCTOR,
+        },
+      },
     };
 
     const updated = [...schedules, newSchedule];
@@ -94,29 +101,43 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const bookAppointment = (
     doctorId: string,
     scheduleId: string,
-    symptoms: string
   ) => {
     if (!currentUser || !currentUser.id || !currentUser.name) return;
 
     const schedule = schedules.find(s => s.id === Number(scheduleId));
     if (!schedule) return;
 
-    const doctor = doctors.find(doc => doc.id === doctorId);
-    const doctorName = doctor ? doctor.name : "Bác sĩ Chuyên khoa";
-    const specialty = doctor ? doctor.specialty : Specialty.GENERAL;
-
     const newAppointment: Appointment = {
-      id: `apt-${Date.now()}`,
-      patientId: currentUser.id,
-      patientName: currentUser.name,
-      doctorId: doctorId,
-      doctorName: doctorName,
-      specialty: specialty,
-      date: schedule.date,
-      timeSlot: `${schedule.start_time} - ${schedule.end_time}`,
+      id: Date.now(),
+      patient_id: Number(currentUser.id),
+      schedule_id: Number(scheduleId),
       status: AppointmentStatus.PENDING,
-      symptoms: symptoms,
-      scheduleId: scheduleId,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      schedule: {
+        id: schedule.id,
+        date: schedule.date,
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+        user: {
+          id: Number(doctorId),
+          name: schedule.user?.name || "Bác sĩ Chuyên khoa",
+          email: schedule.user?.email || "",
+          role: {
+            id: 1,
+            name: UserRole.DOCTOR,
+          },
+        },
+      },
+      patient: {
+        id: Number(currentUser.id),
+        name: currentUser.name,
+        email: currentUser.email || "",
+        role: {
+          id: 2,
+          name: UserRole.PATIENT,
+        },
+      },
     };
 
     const updatedApts = [newAppointment, ...appointments];
@@ -126,14 +147,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const updateAppointmentStatus = (
     appointmentId: string,
     status: AppointmentStatus,
-    notes?: string
   ) => {
     const updated = appointments.map(apt => {
-      if (apt.id === appointmentId) {
+      if (apt.id === Number(appointmentId)) {
         return {
           ...apt,
           status,
-          notes: notes !== undefined ? notes : apt.notes,
         };
       }
       return apt;

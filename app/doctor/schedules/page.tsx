@@ -1,8 +1,8 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import { Card, CardHeader, CardTitle } from "../../../components/ui/card";
-import AddScheduleButtonWithModal from "@/components/doctor/AddScheduleButtonWithModal";
-import ScheduleListComponent from "@/components/doctor/ScheduleListComponent";
 import { getSchedulesServer } from "@/services/schedule";
+import AddScheduleButtonWithModal from "@/components/doctor/schedule/AddScheduleButtonWithModal";
+import ScheduleListComponent from "@/components/doctor/schedule/ScheduleListComponent";
 
 export default async function DoctorSchedulesPage() {
   const queryClient = new QueryClient();
