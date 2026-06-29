@@ -6,6 +6,8 @@ import {
   Appointment,
   AppointmentStatus,
   Specialty,
+  Schedule,
+  UserRole,
 } from "../types";
 import { useAuth } from "./AuthContext";
 import { MOCK_DOCTORS } from "@/constants";
@@ -15,7 +17,10 @@ interface AppContextType {
   setDoctors: React.Dispatch<React.SetStateAction<Doctor[]>>;
   appointments: Appointment[];
   setAppointments: React.Dispatch<React.SetStateAction<Appointment[]>>;
-  bookAppointment: (doctorId: string, date: string, timeSlot: string, symptoms: string) => void;
+  schedules: Schedule[];
+  addSchedule: (date: string, startTime: string, endTime: string) => void;
+  deleteSchedule: (scheduleId: string) => void;
+  bookAppointment: (doctorId: string, scheduleId: string, symptoms: string) => void;
   updateAppointmentStatus: (appointmentId: string, status: AppointmentStatus, notes?: string) => void;
   mobileMenuOpen: boolean;
   setMobileMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -28,9 +33,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [schedules, setSchedules] = useState<Schedule[]>([]);
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  // Load appointments from localStorage on mount (client side only)
+
+  // Load data from localStorage on mount (client side only)
   useEffect(() => {
     const timer = setTimeout(() => {
       const savedApts = localStorage.getItem("clinic_appointments");
@@ -39,6 +46,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           setAppointments(JSON.parse(savedApts));
         } catch {
           setAppointments([]);
+        }
+      }
+
+      const savedSchedules = localStorage.getItem("clinic_schedules");
+      if (savedSchedules) {
+        try {
+          setSchedules(JSON.parse(savedSchedules));
+        } catch {
+          setSchedules([]);
         }
       }
     }, 0);
@@ -52,13 +68,38 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("clinic_appointments", JSON.stringify(newApts));
   };
 
+  const addSchedule = (date: string, startTime: string, endTime: string) => {
+    if (!currentUser || currentUser.role !== UserRole.DOCTOR || !currentUser.id) return;
+
+    const newSchedule: Schedule = {
+      id: Date.now(),
+      user_id: Number(currentUser.id),
+      date: date,
+      start_time: startTime,
+      end_time: endTime,
+      updated_at: new Date().toISOString(),
+    };
+
+    const updated = [...schedules, newSchedule];
+    setSchedules(updated);
+    localStorage.setItem("clinic_schedules", JSON.stringify(updated));
+  };
+
+  const deleteSchedule = (scheduleId: string) => {
+    const updated = schedules.filter(s => s.id !== Number(scheduleId));
+    setSchedules(updated);
+    localStorage.setItem("clinic_schedules", JSON.stringify(updated));
+  };
+
   const bookAppointment = (
     doctorId: string,
-    date: string,
-    timeSlot: string,
+    scheduleId: string,
     symptoms: string
   ) => {
     if (!currentUser || !currentUser.id || !currentUser.name) return;
+
+    const schedule = schedules.find(s => s.id === Number(scheduleId));
+    if (!schedule) return;
 
     const doctor = doctors.find(doc => doc.id === doctorId);
     const doctorName = doctor ? doctor.name : "Bác sĩ Chuyên khoa";
@@ -71,14 +112,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       doctorId: doctorId,
       doctorName: doctorName,
       specialty: specialty,
-      date: date,
-      timeSlot: timeSlot,
+      date: schedule.date,
+      timeSlot: `${schedule.start_time} - ${schedule.end_time}`,
       status: AppointmentStatus.PENDING,
-      symptoms: symptoms
+      symptoms: symptoms,
+      scheduleId: scheduleId,
     };
 
-    const updated = [newAppointment, ...appointments];
-    saveAppointments(updated);
+    const updatedApts = [newAppointment, ...appointments];
+    saveAppointments(updatedApts);
   };
 
   const updateAppointmentStatus = (
@@ -91,11 +133,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         return {
           ...apt,
           status,
-          notes: notes !== undefined ? notes : apt.notes
+          notes: notes !== undefined ? notes : apt.notes,
         };
       }
       return apt;
     });
+
     saveAppointments(updated);
   };
 
@@ -106,10 +149,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setDoctors,
         appointments,
         setAppointments,
+        schedules,
+        addSchedule,
+        deleteSchedule,
         bookAppointment,
         updateAppointmentStatus,
         mobileMenuOpen,
-        setMobileMenuOpen
+        setMobileMenuOpen,
       }}
     >
       {children}

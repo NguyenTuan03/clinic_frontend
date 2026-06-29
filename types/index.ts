@@ -69,6 +69,16 @@ export interface Appointment {
   status: AppointmentStatus;
   symptoms: string; // triệu chứng
   notes?: string; // ghi chú của bác sĩ
+  scheduleId?: string;
+}
+
+export interface Schedule {
+  id: number;
+  user_id: number;
+  date: string;
+  start_time: string;
+  end_time: string;
+  updated_at: string;
 }
 
 export interface TimeSlot {

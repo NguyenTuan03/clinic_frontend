@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { User } from "../types";
+import Cookies from "js-cookie";
 
 interface AuthContextType {
   user: User | null;
@@ -16,15 +17,15 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  // Load user from localStorage on mount (client side only)
+  // Load user from Cookie on mount (client side only)
   useEffect(() => {
     const timer = setTimeout(() => {
-      const savedUser = localStorage.getItem("clinic_user");
+      const savedUser = Cookies.get("clinic_user");
       if (savedUser) {
         try {
           setUser(JSON.parse(savedUser));
         } catch {
-          localStorage.removeItem("clinic_user");
+          Cookies.remove("clinic_user");
         }
       }
     }, 0);
@@ -34,7 +35,8 @@ export function AuthContextProvider({ children }: { children: React.ReactNode })
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("clinic_user");
+    Cookies.remove("clinic_token", { path: "/" });
+    Cookies.remove("clinic_user", { path: "/" });
     router.push("/login");
   };
 

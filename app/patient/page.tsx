@@ -1,25 +1,21 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState, useEffect, useCallback } from "react";
 import { useApp } from "../../context/AppContext";
 import { useAuth } from "../../context/AuthContext";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
-import { Input } from "../../components/ui/input";
 import {
-  HeartPulse,
   Calendar as CalendarIcon,
   Clock,
   Plus,
   Activity,
-  LogOut,
   AlertCircle,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
-import { AppointmentStatus, UserRole, Specialty } from "../../types";
+import { AppointmentStatus, Specialty } from "../../types";
 
 const SPECIALTY_LABELS = {
   [Specialty.GENERAL]: "Nội tổng quát",
@@ -29,36 +25,48 @@ const SPECIALTY_LABELS = {
   [Specialty.DENTISTRY]: "Nha khoa",
 };
 
-const timeSlots = [
-  "08:00 - 09:00",
-  "09:00 - 10:00",
-  "10:00 - 11:00",
-  "11:00 - 12:00",
-  "13:30 - 14:30",
-  "14:30 - 15:30",
-  "15:30 - 16:30",
-  "16:30 - 17:30"
-];
-
 export default function PatientDashboard() {
-  const { doctors, appointments, bookAppointment, updateAppointmentStatus } = useApp();
+  const { doctors, appointments, schedules, bookAppointment, updateAppointmentStatus } = useApp();
   const { user: currentUser } = useAuth();
-  const router = useRouter();
 
   // Form states for booking
   const [selectedDoctorId, setSelectedDoctorId] = useState(doctors[0]?.id || "");
-  const [bookingDate, setBookingDate] = useState(() => {
-    const today = new Date();
-    today.setDate(today.getDate() + 1); // default to tomorrow
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const dd = String(today.getDate()).padStart(2, '0');
-    return `${yyyy}-${mm}-${dd}`;
-  });
-  const [bookingSlot, setBookingSlot] = useState(timeSlots[0]);
+  const [selectedScheduleId, setSelectedScheduleId] = useState("");
   const [symptoms, setSymptoms] = useState("");
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [formError, setFormError] = useState("");
+
+  const checkIsBooked = useCallback((scheduleId: number) => {
+    return appointments.some(
+      apt => Number(apt.scheduleId) === scheduleId && apt.status !== AppointmentStatus.CANCELLED
+    );
+  }, [appointments]);
+
+  // Sync selectedScheduleId when schedules list finishes loading or doctor changes asynchronously to avoid cascading renders
+  useEffect(() => {
+    const doctorSchedules = schedules.filter(s => s.user_id === Number(selectedDoctorId) && !checkIsBooked(s.id));
+    const targetId = doctorSchedules.length > 0 ? String(doctorSchedules[0].id) : "";
+    
+    const timer = setTimeout(() => {
+      setSelectedScheduleId(targetId);
+    }, 0);
+    return () => clearTimeout(timer);
+  }, [selectedDoctorId, schedules, checkIsBooked]);
+
+  const handleDoctorChange = (doctorId: string) => {
+    setSelectedDoctorId(doctorId);
+    const doctorSchedules = schedules.filter(s => s.user_id === Number(doctorId) && !checkIsBooked(s.id));
+    if (doctorSchedules.length > 0) {
+      setSelectedScheduleId(String(doctorSchedules[0].id));
+    } else {
+      setSelectedScheduleId("");
+    }
+  };
+
+  // Filter available schedules for the selected doctor
+  const availableSchedules = schedules.filter(
+    s => s.user_id === Number(selectedDoctorId) && !checkIsBooked(s.id)
+  );
 
   // Filter appointments for this patient
   const patientAppointments = currentUser
@@ -67,13 +75,13 @@ export default function PatientDashboard() {
 
   const handleBook = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedDoctorId || !bookingDate || !bookingSlot || !symptoms.trim()) {
+    if (!selectedDoctorId || !selectedScheduleId || !symptoms.trim()) {
       setFormError("Vui lòng nhập đầy đủ các trường và triệu chứng");
       return;
     }
 
     setFormError("");
-    bookAppointment(selectedDoctorId, bookingDate, bookingSlot, symptoms);
+    bookAppointment(selectedDoctorId, selectedScheduleId, symptoms);
     setSymptoms("");
     setBookingSuccess(true);
     setTimeout(() => setBookingSuccess(false), 5000); // hide success alert after 5s
@@ -120,7 +128,7 @@ export default function PatientDashboard() {
                 </label>
                 <select
                   value={selectedDoctorId}
-                  onChange={(e) => setSelectedDoctorId(e.target.value)}
+                  onChange={(e) => handleDoctorChange(e.target.value)}
                   className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-sm"
                 >
                   {doctors.map(doc => (
@@ -131,36 +139,33 @@ export default function PatientDashboard() {
                 </select>
               </div>
 
-              {/* Date Selection */}
-              <Input
-                label="Chọn ngày khám"
-                type="date"
-                value={bookingDate}
-                min={new Date().toISOString().split('T')[0]} // limit past dates
-                onChange={(e) => setBookingDate(e.target.value)}
-                required
-              />
-
-              {/* Time Slot Selection */}
+              {/* Dynamic Schedule/Time Slot Selection */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
-                  Chọn khung giờ
+                  Chọn khung giờ khám rảnh của bác sĩ
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  {timeSlots.map(slot => (
-                    <button
-                      type="button"
-                      key={slot}
-                      onClick={() => setBookingSlot(slot)}
-                      className={`px-3 py-2 text-xs font-semibold rounded-xl border text-center transition-all cursor-pointer ${bookingSlot === slot
-                        ? "bg-emerald-600 border-emerald-600 text-white shadow-xs"
-                        : "bg-white dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:border-emerald-500"
-                        }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </div>
+                {availableSchedules.length === 0 ? (
+                  <div className="p-3.5 bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/20 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-semibold leading-relaxed">
+                    Bác sĩ hiện tại chưa thiết lập lịch rảnh khả dụng nào. Vui lòng quay lại sau hoặc chọn Bác sĩ khác.
+                  </div>
+                ) : (
+                  <select
+                    value={selectedScheduleId}
+                    onChange={(e) => setSelectedScheduleId(e.target.value)}
+                    className="w-full px-3.5 py-2.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 text-sm"
+                  >
+                    {availableSchedules
+                      .sort((a, b) => {
+                        if (a.date !== b.date) return a.date.localeCompare(b.date);
+                        return a.start_time.localeCompare(b.start_time);
+                      })
+                      .map(sch => (
+                        <option key={sch.id} value={String(sch.id)}>
+                          Ngày {sch.date} ({sch.start_time} - {sch.end_time})
+                        </option>
+                      ))}
+                  </select>
+                )}
               </div>
 
               {/* Symptoms Textarea */}
@@ -178,7 +183,12 @@ export default function PatientDashboard() {
                 />
               </div>
 
-              <Button type="submit" variant="primary" className="w-full shadow-md shadow-emerald-600/10">
+              <Button 
+                type="submit" 
+                variant="primary" 
+                className="w-full shadow-md shadow-emerald-600/10"
+                disabled={availableSchedules.length === 0}
+              >
                 Gửi yêu cầu đặt hẹn
               </Button>
             </form>

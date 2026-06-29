@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { UserRole, User } from "@/types";
 import toast from "react-hot-toast";
+import Cookies from "js-cookie";
 
 interface LoginResponse {
   success: boolean;
@@ -23,17 +24,17 @@ export function useLogin() {
     mutationFn: (credentials) => http.post<LoginResponse>("/auth/login", credentials),
     onSuccess: (response) => {
       const token = response.data.token;
-      const loggedInUser: User & { token?: string } = {
-        ...response.data.user,
-        token: token
-      };
+      const user = response.data.user;
 
-      setUser(loggedInUser);
-      localStorage.setItem("clinic_user", JSON.stringify(loggedInUser));
+      setUser(user);
+      
+      // Lưu vào Cookie hạn 7 ngày
+      Cookies.set("clinic_token", token, { expires: 7, secure: true, sameSite: "strict" });
+      Cookies.set("clinic_user", JSON.stringify(user), { expires: 7, secure: true, sameSite: "strict" });
 
       toast.success(response.message || "Đăng nhập thành công!");
 
-      if (loggedInUser.role === UserRole.DOCTOR) {
+      if (user.role === UserRole.DOCTOR) {
         router.push("/doctor");
       } else {
         router.push("/patient");

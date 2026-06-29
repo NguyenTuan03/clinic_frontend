@@ -7,6 +7,33 @@ import { useRegister } from "@/hooks/useRegister";
 import { Button } from "../ui/button";
 import { ArrowRight } from "lucide-react";
 
+const registerForm = [
+  {
+    id: "name",
+    label: "Họ và tên của bạn",
+    type: "text",
+    placeholder: "Nguyễn Văn A",
+  },
+  {
+    id: "email",
+    label: "Địa chỉ Email",
+    type: "email",
+    placeholder: "nguyenvana@gmail.com",
+  },
+  {
+    id: "password",
+    label: "Mật khẩu",
+    type: "password",
+    placeholder: "Nhập mật khẩu",
+  },
+  {
+    id: "confirmPassword",
+    label: "Nhập lại mật khẩu",
+    type: "password",
+    placeholder: "Nhập lại mật khẩu",
+  },
+] as const
+
 export default function RegisterForm() {
   const { register, isPending, isError, error: serverError } = useRegister();
 
@@ -64,45 +91,18 @@ export default function RegisterForm() {
           </div>
         )}
 
-        <Input
-          label="Họ và tên của bạn"
-          type="text"
-          placeholder="Nguyễn Văn A"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          error={errors.name}
-          required
-        />
-
-        <Input
-          label="Địa chỉ Email"
-          type="email"
-          placeholder="nguyenvana@gmail.com"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          error={errors.email}
-          required
-        />
-
-        <Input
-          label="Mật khẩu"
-          type="password"
-          placeholder="Nhập mật khẩu"
-          value={formData.password}
-          onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-          error={errors.password}
-          required
-        />
-
-        <Input
-          label="Nhập lại mật khẩu"
-          type="password"
-          placeholder="Nhập lại mật khẩu"
-          value={formData.confirmPassword}
-          onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-          error={errors.confirmPassword}
-          required
-        />
+        {registerForm.map((field) => (
+          <Input
+            key={field.id}
+            label={field.label}
+            type={field.type}
+            placeholder={field.placeholder}
+            value={formData[field.id]}
+            onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+            error={errors[field.id]}
+            required
+          />
+        ))}
 
         <Button
           type="submit"

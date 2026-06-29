@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
+import Cookies from "js-cookie";
 
 const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 const apiVersion = process.env.NEXT_PUBLIC_VERSION || "api/v1";
@@ -11,21 +12,13 @@ const httpInstance = axios.create({
   },
 });
 
-// Interceptor cho Request: tự động đính kèm Token xác thực nếu có
+// Interceptor cho Request: tự động đính kèm Token xác thực nếu có từ Cookie
 httpInstance.interceptors.request.use(
   (config) => {
     if (typeof window !== "undefined") {
-      const savedUser = localStorage.getItem("clinic_user");
-      if (savedUser) {
-        try {
-          const user = JSON.parse(savedUser);
-          // Giả sử API trả về token nằm trong thuộc tính token của user
-          if (user && user.token) {
-            config.headers.Authorization = `Bearer ${user.token}`;
-          }
-        } catch {
-          // Bỏ qua nếu lỗi parse JSON
-        }
+      const token = Cookies.get("clinic_token");
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
       }
     }
     return config;
@@ -41,7 +34,8 @@ httpInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       if (typeof window !== "undefined") {
-        localStorage.removeItem("clinic_user");
+        Cookies.remove("clinic_token");
+        Cookies.remove("clinic_user");
         window.location.href = "/login";
       }
     }
