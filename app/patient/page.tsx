@@ -94,7 +94,6 @@ export default function PatientDashboard() {
 
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full grid lg:grid-cols-12 gap-8">
-
       {/* Left Side: Booking Form */}
       <div className="lg:col-span-5 space-y-6">
         <Card className="sticky top-24">

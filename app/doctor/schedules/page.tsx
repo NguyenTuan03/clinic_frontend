@@ -1,8 +1,18 @@
 import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
+import { Metadata } from "next";
 import { Card, CardHeader, CardTitle } from "../../../components/ui/card";
 import { getSchedulesServer } from "@/services/schedule";
 import AddScheduleButtonWithModal from "@/components/doctor/schedule/AddScheduleButtonWithModal";
 import ScheduleListComponent from "@/components/doctor/schedule/ScheduleListComponent";
+
+export const metadata: Metadata = {
+  title: "Cấu hình lịch rảnh làm việc | Phòng khám Đa khoa Tâm An",
+  description: "Thiết lập các khung giờ rảnh trống của Bác sĩ trên hệ thống để bệnh nhân đặt lịch.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
 export default async function DoctorSchedulesPage() {
   const queryClient = new QueryClient();

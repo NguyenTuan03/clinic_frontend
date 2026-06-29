@@ -19,6 +19,26 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Phòng khám Đa khoa Tâm An - Đặt lịch & Quản lý lịch hẹn trực tuyến",
   description: "Trang web phòng khám đa khoa hiện đại, thân thiện, đặt lịch dễ dàng và theo dõi quá trình khám bệnh chuyên nghiệp.",
+  icons: {
+    icon: "/clinic_icon.jpg",
+    apple: "/clinic_icon.jpg",
+  },
+  openGraph: {
+    title: "Phòng khám Đa khoa Tâm An - Đặt lịch & Quản lý lịch hẹn trực tuyến",
+    description: "Trang web phòng khám đa khoa hiện đại, thân thiện, đặt lịch dễ dàng và theo dõi quá trình khám bệnh chuyên nghiệp.",
+    url: "https://cliniccare-omega.vercel.app",
+    siteName: "Tâm An Clinic",
+    images: [
+      {
+        url: "https://cliniccare-omega.vercel.app/clinic_icon.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Tâm An Clinic Logo",
+      },
+    ],
+    locale: "vi_VN",
+    type: "website",
+  },
 };
 
 export default function RootLayout({

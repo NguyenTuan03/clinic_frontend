@@ -1,6 +1,35 @@
 import Link from "next/link";
 import { Card, CardHeader, CardTitle, CardFooter } from "../../../components/ui/card";
 import RegisterForm from "@/components/auth/RegisterForm";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: 'Đăng ký tài khoản | Phòng khám Đa khoa Tâm An',
+  description: 'Đăng ký tài khoản Phòng khám Đa khoa Tâm An để đặt lịch khám bệnh trực tuyến.',
+  icons: {
+    icon: "/clinic_icon.jpg",
+    apple: "/clinic_icon.jpg",
+  },
+  alternates: {
+    canonical: 'https://cliniccare-omega.vercel.app/register',
+  },
+  openGraph: {
+    title: 'Đăng ký tài khoản | Phòng khám Đa khoa Tâm An',
+    description: 'Đăng ký tài khoản Phòng khám Đa khoa Tâm An để đặt lịch khám bệnh trực tuyến.',
+    url: 'https://cliniccare-omega.vercel.app/register',
+    siteName: 'Tâm An Clinic',
+    images: [
+      {
+        url: "https://cliniccare-omega.vercel.app/clinic_icon.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Tâm An Clinic Logo",
+      },
+    ],
+    locale: 'vi_VN',
+    type: 'website',
+  },
+}
 
 export default function Register() {
   return (
