@@ -1,9 +1,19 @@
 import { getAppointmentsServer } from "@/services/appointment";
+import { dehydrate, HydrationBoundary, QueryClient } from "@tanstack/react-query";
 import StatsCards from "@/components/doctor/dashboard/StatsCardContents";
 
 export default async function DoctorDashboard() {
-  // Lấy danh sách lịch hẹn ở Server Side
-  const appointments = await getAppointmentsServer();
+  const queryClient = new QueryClient();
 
-  return <StatsCards appointments={appointments} />;
+  // Prefetch danh sách lịch hẹn của bác sĩ để nạp vào cache
+  await queryClient.prefetchQuery({
+    queryKey: ["appointments"],
+    queryFn: getAppointmentsServer,
+  });
+
+  return (
+    <HydrationBoundary state={dehydrate(queryClient)}>
+      <StatsCards />
+    </HydrationBoundary>
+  );
 }

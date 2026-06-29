@@ -2,10 +2,18 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Appointment, AppointmentStatus } from "@/types";
 import { useAuth } from "@/context/AuthContext";
+import { useQuery } from "@tanstack/react-query";
+import { getAppointmentsServer } from "@/services/appointment";
 
-
-export default function StatsCards({ appointments }: { appointments: Appointment[] }) {
+export default function StatsCards() {
     const { user: currentUser } = useAuth();
+
+    // Đọc danh sách lịch hẹn từ React Query cache (được prefetch và hydrate từ server)
+    const { data: appointments = [] } = useQuery<Appointment[]>({
+        queryKey: ["appointments"],
+        queryFn: getAppointmentsServer,
+        enabled: !!currentUser,
+    });
 
     if (!currentUser) return null;
 
@@ -35,6 +43,7 @@ export default function StatsCards({ appointments }: { appointments: Appointment
         today: todayAppointments.filter((a) => a.status === AppointmentStatus.CONFIRMED).length,
         cancelled: doctorAppointments.filter((a) => a.status === AppointmentStatus.CANCELLED).length,
     };
+
     return (
         <div className="animate-fadeIn">
             {/* Stats Bar */}
