@@ -6,6 +6,16 @@ import UserProfileBriefComponent from "@/components/layout/patient/UserProfileBr
 import MobileDrawerComponent from "@/components/layout/patient/MobileDrawer";
 import SidebarMenu from "@/components/layout/patient/SidebarMenu";
 import LogoutButton from "@/components/layout/patient/LogoutButton";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+    title: "Cổng thông tin Bệnh nhân | Phòng khám Đa khoa Tâm An",
+    description: "Cổng thông tin dành cho Bệnh nhân đặt lịch hẹn khám bệnh và theo dõi quá trình điều trị trực tuyến.",
+    robots: {
+        index: false,
+        follow: false,
+    },
+};
 
 export default function PatientLayout({ children }: { children: React.ReactNode }) {
     return (
