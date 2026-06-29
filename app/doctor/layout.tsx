@@ -13,14 +13,29 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Button } from "../../components/ui/button";
-import { AppointmentStatus, UserRole } from "../../types";
-import { useApp } from "../../context/AppContext";
+import { AppointmentStatus, UserRole, Appointment } from "../../types";
+import { useQuery } from "@tanstack/react-query";
+import { getAppointmentsServer } from "@/services/appointment";
 
-export default function DoctorLayout({ children }: { children: React.ReactNode }) {
+export default function DoctorLayout({ 
+  children, 
+  appointments,
+  schedules
+}: { 
+  children: React.ReactNode;
+  appointments?: React.ReactNode;
+  schedules?: React.ReactNode;
+}) {
   const { user: currentUser, logout } = useAuth();
-  const { appointments } = useApp();
   const router = useRouter();
   const pathname = usePathname();
+
+  // Load appointments data from React Query (using the slot-hydrated cache)
+  const { data: appointmentsData = [] } = useQuery<Appointment[]>({
+    queryKey: ["appointments"],
+    queryFn: getAppointmentsServer,
+    enabled: !!currentUser,
+  });
 
   // Protection Check
   useEffect(() => {
@@ -51,9 +66,30 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
     router.push("/login");
   };
 
-  const pendingCount = appointments.filter(
+  const pendingCount = appointmentsData.filter(
     a => a.schedule?.user?.id === Number(currentUser.id) && a.status === AppointmentStatus.PENDING
   ).length;
+
+  const navItems = [
+    {
+      href: "/doctor",
+      label: "Tổng quan",
+      icon: Activity,
+    },
+    {
+      href: "/doctor/appointments",
+      label: "Lịch hẹn bệnh nhân",
+      icon: CalendarIcon,
+      badge: pendingCount > 0 ? pendingCount : undefined,
+    },
+    {
+      href: "/doctor/schedules",
+      label: "Cấu hình lịch rảnh",
+      icon: Sliders,
+    },
+  ];
+
+  const isDashboard = pathname === "/doctor";
 
   return (
     <div className="min-h-screen bg-slate-50/50 dark:bg-zinc-950 flex flex-col">
@@ -91,49 +127,72 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
         {/* Navigation Sidebar */}
         <aside className="lg:col-span-3">
           <div className="bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800/50 rounded-2xl p-4 space-y-2 flex flex-col">
-            <Link
-              href="/doctor"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                }`}
-            >
-              <Activity className="w-5 h-5" />
-              <span>Tổng quan</span>
-            </Link>
-
-            <Link
-              href="/doctor/appointments"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor/appointments"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                }`}
-            >
-              <CalendarIcon className="w-5 h-5" />
-              <span>Lịch hẹn bệnh nhân</span>
-              {pendingCount > 0 && (
-                <span className="ml-auto bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
-                  {pendingCount}
-                </span>
-              )}
-            </Link>
-
-            <Link
-              href="/doctor/schedules"
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${pathname === "/doctor/schedules"
-                  ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
-                  : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
-                }`}
-            >
-              <Sliders className="w-5 h-5" />
-              <span>Cấu hình lịch rảnh</span>
-            </Link>
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/10"
+                      : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-900"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.label}</span>
+                  {item.badge !== undefined && (
+                    <span className="ml-auto bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full animate-pulse">
+                      {item.badge}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
           </div>
         </aside>
 
         {/* Main Content Area */}
-        <main className="lg:col-span-9">
-          {children}
+        <main className="lg:col-span-9 space-y-6">
+          {isDashboard ? (
+            <>
+              {/* Dashboard stats */}
+              {children}
+
+              {/* Grid song song: Lịch hẹn & Lịch rảnh */}
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 items-start">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                      Lịch hẹn bệnh nhân
+                    </h3>
+                  </div>
+                  {appointments}
+                </div>
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                      Cấu hình lịch biểu rảnh
+                    </h3>
+                  </div>
+                  {schedules}
+                </div>
+              </div>
+            </>
+          ) : (
+            <>
+              {/* Render children for other routes */}
+              {children}
+              
+              {/* Render parallel slots invisibly to allow Next.js routing resolution */}
+              <div className="hidden">
+                {appointments}
+                {schedules}
+              </div>
+            </>
+          )}
         </main>
       </div>
     </div>
