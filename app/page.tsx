@@ -10,18 +10,14 @@ import {
   Clock,
   Phone,
   MapPin,
-  Star
+  Star,
+  Brain,
+  Baby,
+  Stethoscope,
+  Smile,
+  Activity,
+  ArrowRight,
 } from "lucide-react";
-import { Specialty } from "@/types";
-import { MOCK_DOCTORS } from "@/constants";
-
-const SPECIALTY_LABELS = {
-  [Specialty.GENERAL]: "Nội tổng quát",
-  [Specialty.PEDIATRICS]: "Nhi khoa",
-  [Specialty.CARDIOLOGY]: "Tim mạch",
-  [Specialty.DERMATOLOGY]: "Da liễu",
-  [Specialty.DENTISTRY]: "Nha khoa",
-};
 
 export default function Home() {
   return (
@@ -62,7 +58,7 @@ export default function Home() {
                     alt="Bác sĩ tại phòng khám"
                     className="rounded-[1.5rem] w-full object-cover h-[350px] sm:h-[400px]"
                   />
-                  
+
                   {/* Floating badge */}
                   <div className="absolute -bottom-6 -left-6 bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 p-4 rounded-2xl shadow-lg flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
@@ -132,49 +128,83 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Featured Doctors Section */}
-      <section id="doctors" className="py-20">
+      {/* Featured Specialties Section */}
+      <section id="doctors" className="py-20 bg-white dark:bg-zinc-900/40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
+          <div className="text-center max-w-3xl mx-auto mb-14">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-zinc-900 dark:text-white mb-4">
-              Đội ngũ bác sĩ chuyên khoa
+              Chuyên khoa nổi bật
             </h2>
             <p className="text-zinc-600 dark:text-zinc-400">
-              Đội ngũ y bác sĩ Tâm An luôn nỗ lực hết mình vì sức khỏe của người bệnh, tận tụy và chu đáo.
+              Đội ngũ y bác sĩ chuyên môn cao, tận tụy và chu đáo trong từng chuyên khoa.
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {MOCK_DOCTORS.map((doctor) => (
-              <Card key={doctor.id} className="group hover:-translate-y-1 transition-all duration-300">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={doctor.avatar}
-                      alt={doctor.name}
-                      className="w-20 h-20 rounded-2xl object-cover border border-zinc-100 dark:border-zinc-800"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 dark:bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs font-semibold mb-2">
-                        {SPECIALTY_LABELS[doctor.specialty]}
-                      </span>
-                      <h3 className="font-bold text-zinc-900 dark:text-white text-base truncate mb-1">
-                        {doctor.name}
-                      </h3>
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">
-                        {doctor.experience} năm kinh nghiệm
-                      </p>
-                      <div className="flex items-center gap-1">
-                        <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-                        <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">
-                          {doctor.rating}
-                        </span>
-                      </div>
-                    </div>
+          {/* Specialties grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-10">
+            {[
+              {
+                icon: <Stethoscope className="w-6 h-6" />,
+                name: "Nội tổng quát",
+                desc: "Khám và điều trị các bệnh lý nội khoa, bệnh mãn tính và theo dõi sức khỏe tổng quát.",
+                count: "20+ bác sĩ",
+                color: "bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+              },
+              {
+                icon: <Baby className="w-6 h-6" />,
+                name: "Nhi khoa",
+                desc: "Chăm sóc sức khỏe toàn diện cho trẻ em từ sơ sinh đến tuổi vị thành niên.",
+                count: "12+ bác sĩ",
+                color: "bg-sky-50 dark:bg-sky-500/10 text-sky-600 dark:text-sky-400",
+              },
+              {
+                icon: <Activity className="w-6 h-6" />,
+                name: "Tim mạch",
+                desc: "Chẩn đoán và can thiệp các bệnh lý tim mạch với trang thiết bị hiện đại.",
+                count: "8+ bác sĩ",
+                color: "bg-rose-50 dark:bg-rose-500/10 text-rose-600 dark:text-rose-400",
+              },
+              {
+                icon: <Brain className="w-6 h-6" />,
+                name: "Da liễu",
+                desc: "Điều trị các bệnh về da, thẩm mỹ da và các rối loạn da liễu chuyên sâu.",
+                count: "10+ bác sĩ",
+                color: "bg-violet-50 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400",
+              },
+              {
+                icon: <Smile className="w-6 h-6" />,
+                name: "Nha khoa",
+                desc: "Chăm sóc răng miệng toàn diện, phục hồi và thẩm mỹ nụ cười.",
+                count: "15+ bác sĩ",
+                color: "bg-amber-50 dark:bg-amber-500/10 text-amber-600 dark:text-amber-400",
+              },
+              {
+                icon: <Star className="w-6 h-6" />,
+                name: "Và nhiều hơn nữa",
+                desc: "Không ngừng mở rộng đội ngũ và danh mục chuyên khoa phục vụ bệnh nhân tốt hơn mỗi ngày.",
+                count: "65+ bác sĩ",
+                color: "bg-zinc-50 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400",
+              },
+            ].map((spec) => (
+              <div
+                key={spec.name}
+                className="group p-6 rounded-2xl border border-zinc-100 dark:border-zinc-800 bg-white dark:bg-zinc-900 hover:border-emerald-200 dark:hover:border-emerald-500/30 hover:shadow-md transition-all duration-300 flex flex-col gap-4"
+              >
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${spec.color}`}>
+                  {spec.icon}
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <h3 className="font-bold text-zinc-900 dark:text-white text-base">{spec.name}</h3>
+                    <span className="text-xs font-semibold text-zinc-400 dark:text-zinc-500">{spec.count}</span>
                   </div>
-                </CardContent>
-              </Card>
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{spec.desc}</p>
+                </div>
+                <div className="flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span>Xem bác sĩ</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </div>
+              </div>
             ))}
           </div>
         </div>

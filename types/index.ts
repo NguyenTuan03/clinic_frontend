@@ -10,20 +10,6 @@ export enum AppointmentStatus {
   CANCELLED = "cancelled"  // Đã hủy
 }
 
-export enum Specialty {
-  GENERAL = "GENERAL",
-  PEDIATRICS = "PEDIATRICS",
-  CARDIOLOGY = "CARDIOLOGY",
-  DERMATOLOGY = "DERMATOLOGY",
-  DENTISTRY = "DENTISTRY"
-}
-
-export enum Gender {
-  MALE = "MALE",
-  FEMALE = "FEMALE",
-  OTHER = "OTHER"
-}
-
 export interface User {
   id?: string;
   email?: string;
@@ -40,8 +26,6 @@ export interface UserRegister {
 export interface Doctor {
   id: string;
   name: string;
-  specialty: Specialty;
-  experience: number; // số năm kinh nghiệm
   rating: number;
   avatar: string;
   email: string;
@@ -51,8 +35,6 @@ export interface Doctor {
 export interface Patient {
   id: string;
   name: string;
-  gender: Gender;
-  dateOfBirth: string;
   phone: string;
   email: string;
 }

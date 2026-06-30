@@ -9,7 +9,6 @@ import {
   UserRole,
 } from "../types";
 import { useAuth } from "./AuthContext";
-import { MOCK_DOCTORS } from "@/constants";
 
 interface AppContextType {
   doctors: Doctor[];
@@ -30,7 +29,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export function AppProvider({ children }: { children: React.ReactNode }) {
   const { user: currentUser } = useAuth();
 
-  const [doctors, setDoctors] = useState<Doctor[]>(MOCK_DOCTORS);
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [schedules, setSchedules] = useState<Schedule[]>([]);
 
